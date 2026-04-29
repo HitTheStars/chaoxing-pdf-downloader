@@ -1,43 +1,124 @@
+<div align="center">
+
 # 📚 Chaoxing PDF Downloader
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.8%2B-blue" alt="Python 3.8+">
-  <img src="https://img.shields.io/badge/Playwright-1.40%2B-green" alt="Playwright 1.40+">
-  <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License: MIT">
+<p>
+  <img src="https://img.shields.io/badge/Python-3.8%2B-blue?style=flat-square" alt="Python 3.8+">
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-green?style=flat-square" alt="Platform">
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="License: MIT">
 </p>
 
-<p align="center">
-  <b>超星学习通 PDF 批量下载器</b> —— 一键下载课程中「不可下载」的 PDF 课件
+<p>
+  <b>超星学习通 PDF 批量下载器</b><br>
+  一键下载课程中「没有下载按钮」的 PDF 课件
 </p>
+
+[//]: # (<img src="assets/demo.png" width="600" alt="演示截图">)
+
+</div>
 
 ---
 
 ## ✨ 功能特性
 
-- 🔍 **自动嗅探**：自动扫描当前课程页面中的所有 PDF 资源，无需手动查找链接
-- 🛡️ **绕开限制**：针对「无下载按钮」或「下载按钮被禁用」的 PDF，从云盘预览页源码中提取真实下载链接
-- 🍪 **持久登录**：基于 Chrome DevTools Protocol (CDP) + 持久化用户目录，登录一次，长期有效
-- 📂 **智能命名**：自动从 URL 中提取原始文件名，支持自动重名处理
-- 🚀 **简单易用**：仅需两条命令，即可完成从登录到下载的全过程
+- 🔍 **自动嗅探** —— 无需手动找链接，自动扫描当前课程页面中的所有 PDF
+- 🛡️ **绕开限制** —— 针对「下载按钮被禁用」的 PDF，从云盘预览页源码中提取真实下载链接
+- 🍪 **持久登录** —— 登录一次，长期有效，不用每次重复扫码
+- 🖥️ **跨平台** —— 支持 Windows、macOS、Linux
+- 📂 **智能命名** —— 自动保留原始文件名，支持防重名
 
 ---
 
 ## 📖 原理说明
 
-超星学习通的课程 PDF 通常通过以下两种方式嵌入：
+超星学习通的 PDF 通常以两种方式嵌入：
 
 | 类型 | 说明 | 本工具的处理方式 |
 |------|------|----------------|
-| **云盘预览页** (`pan-yz.chaoxing.com`) | PDF 托管在超星云盘，页面通过 iframe 嵌入预览 | 读取 iframe 的 HTML 源码，正则提取 `*/download/*` 真实直链，并在 iframe 内触发点击，保证 Referer 正确 |
-| **PDF Viewer** (`/ananas/modules/pdf/...`) | 基于 PDF.js 的内置阅读器 | 提取 `#downloadUrl` 元素的 `href` 属性，若未被禁用则直接点击下载 |
+| **云盘预览页** | PDF 托管在 `pan-yz.chaoxing.com`，页面通过 iframe 嵌入 | 读取 iframe HTML 源码，正则提取 `*/download/*` 真实直链，在 iframe 内触发点击，保证 Referer 正确 |
+| **PDF Viewer** | 基于 PDF.js 的内置阅读器 | 提取 `#downloadUrl` 元素的 `href`，若未被禁用则直接点击下载 |
 
-下载链接包含时效性签名参数（`at_`, `ak_`, `ad_`），直接复制到浏览器外访问会返回 `403`。本工具通过在**对应的 iframe 上下文内**触发下载，确保请求携带正确的 Cookie 和 Referer，从而绕开验证。
+下载链接包含时效性签名（`at_`, `ak_`, `ad_`），直接复制到外部访问会返回 `403`。本工具通过在**对应的 iframe 上下文内**触发下载，确保请求携带正确的 Cookie 和 Referer，从而绕开验证。
 
 ---
 
-## 🖼️ 效果预览
+## 🚀 快速开始
 
-<!-- 建议替换为实际截图 -->
+### 第一步：下载本项目
+
+点击右上角绿色按钮 **<> Code → Download ZIP**，解压到任意文件夹。
+
+或者使用 Git：
+```bash
+git clone https://github.com/HitTheStars/chaoxing-pdf-downloader.git
+cd chaoxing-pdf-downloader
+```
+
+---
+
+### 第二步：一键安装（推荐）
+
+#### 🪟 Windows
+
+1. 确保已安装 [Python 3.8+](https://www.python.org/downloads/)（安装时勾选 **"Add Python to PATH"**）
+2. 进入项目文件夹，**右键** `install.ps1` → **使用 PowerShell 运行**
+
+或者打开 PowerShell，执行：
+```powershell
+powershell -ExecutionPolicy Bypass -File install.ps1
+```
+
+#### 🍎 macOS / 🐧 Linux
+
+打开终端，进入项目文件夹，执行：
+```bash
+chmod +x install.sh
+./install.sh
+```
+
+> 安装过程会自动创建虚拟环境、安装依赖、下载 Playwright 浏览器（约 100MB，仅需一次）。
+
+---
+
+### 第三步：启动浏览器并登录
+
+#### Windows
+```powershell
+.\.venv\Scripts\python.exe chaoxing_pdf_downloader.py --launch
+```
+
+#### macOS / Linux
+```bash
+./.venv/bin/python chaoxing_pdf_downloader.py --launch
+```
+
+- 系统会弹出一个 Chrome 窗口
+- **手动登录**你的超星学习通账号
+- 登录完成后，在终端按 `Ctrl+C` 结束进程
+- 浏览器会继续在后台运行，登录状态保存在 `.chaoxing_profile` 文件夹中
+
+---
+
+### 第四步：下载 PDF
+
+在浏览器中打开你想下载的课程章节，然后执行：
+
+#### Windows
+```powershell
+.\.venv\Scripts\python.exe chaoxing_pdf_downloader.py --download
+```
+
+#### macOS / Linux
+```bash
+./.venv/bin/python chaoxing_pdf_downloader.py --download
+```
+
+下载的文件默认保存在系统的 **下载文件夹**（`~/Downloads` 或 `C:\Users\用户名\Downloads`）。
+
+---
+
+### 完整演示
+
 ```text
 [*] 正在扫描页面中的 PDF 资源...
 [*] 共 33 个 frames
@@ -46,82 +127,39 @@
   └─ 发现下载链接 -> 第1讲软硬件介绍.pdf
 [Frame 17] 云盘预览页  file_id=08b15335d3f665287f4b26775afd1d1d
   └─ 发现下载链接 -> 第1讲GPIO.pdf
-[Frame 22] 云盘预览页  file_id=d3328256c45f30ed7bc2f6ac7106729d
-  └─ 发现下载链接 -> 第2讲定时器.pdf
 
 [*] 共发现 5 个 PDF，开始下载...
 
 [↓] 开始下载: 第1讲软硬件介绍.pdf
     ✓ 成功 (4,988,243 bytes)
-...
+
 [*] 全部完成: 5/5 成功
 ```
-
----
-
-## 🚀 快速开始
-
-### 1. 安装依赖
-
-```bash
-# 安装 Python 依赖
-pip install -r requirements.txt
-
-# 安装 Playwright 浏览器（仅需一次）
-playwright install chromium
-```
-
-或使用 `uv`：
-```bash
-uv pip install -r requirements.txt
-python -m playwright install chromium
-```
-
-### 2. 首次使用：启动浏览器并登录
-
-```bash
-python src/chaoxing_pdf_downloader.py --launch
-```
-
-- 系统会弹出一个 Chrome 窗口
-- **手动登录**你的超星学习通账号
-- 登录完成后，在终端按 `Ctrl+C` 结束进程
-- 浏览器会继续在后台运行，登录状态保存在 `/tmp/chaoxing_profile`
-
-### 3. 下载 PDF
-
-在浏览器中打开你想下载的课程章节，然后执行：
-
-```bash
-python src/chaoxing_pdf_downloader.py --download
-```
-
-下载的文件默认保存在 `~/Downloads` 目录。
 
 ---
 
 ## ⚙️ 命令行参数
 
 ```bash
-python src/chaoxing_pdf_downloader.py [选项]
+python chaoxing_pdf_downloader.py [选项]
 ```
 
 | 参数 | 说明 | 示例 |
 |------|------|------|
 | `--launch` | 启动持久化浏览器（首次使用） | `--launch` |
 | `--download` | 连接浏览器并下载当前页面所有 PDF | `--download` |
-| `--profile` | Chrome 用户数据目录 | `--profile /tmp/my_profile` |
-| `--output` | PDF 保存目录 | `--output ./my_pdfs` |
+| `--profile` | Chrome 用户数据目录 | `--profile ./my_profile` |
+| `--output` | PDF 保存目录 | `--output ./course_pdfs` |
 | `--cdp` | CDP 调试地址 | `--cdp http://localhost:9222` |
 
-### 完整示例
+### 指定下载目录示例
 
 ```bash
-# 启动浏览器（登录一次）
-python src/chaoxing_pdf_downloader.py --launch
+# Windows
+.\.venv\Scripts\python.exe chaoxing_pdf_downloader.py --download --output D:\课程资料
 
-# 下载到指定目录
-python src/chaoxing_pdf_downloader.py --download --output ./course_pdfs
+# macOS / Linux
+./.venv/bin/python chaoxing_pdf_downloader.py --download --output ~/课程资料
 ```
 
 ---
@@ -130,41 +168,67 @@ python src/chaoxing_pdf_downloader.py --download --output ./course_pdfs
 
 ```
 chaoxing-pdf-downloader/
-├── src/
-│   └── chaoxing_pdf_downloader.py   # 主程序
-├── requirements.txt                 # Python 依赖
-├── .gitignore                       # Git 忽略配置
-├── LICENSE                          # MIT 许可证
-└── README.md                        # 本文件
+├── chaoxing_pdf_downloader.py    # 主程序
+├── install.ps1                   # Windows 一键安装脚本
+├── install.sh                    # macOS / Linux 一键安装脚本
+├── pyproject.toml                # pip 安装配置
+├── requirements.txt              # Python 依赖
+├── .gitignore                    # Git 忽略配置
+├── LICENSE                       # MIT 许可证
+└── README.md                     # 本文件
 ```
 
 ---
 
 ## ❓ 常见问题
 
-### Q1: 提示 "浏览器已启动但 CDP 端口 9222 不可用"
+### Q1: 安装时提示 "未检测到 Python"
+
+- **Windows**: 从 [python.org](https://www.python.org/downloads/) 下载安装包，**安装时必须勾选 "Add Python to PATH"**
+- **macOS**: `brew install python3`
+- **Linux**: `sudo apt install python3 python3-venv python3-pip` (Ubuntu/Debian) 或 `sudo pacman -S python` (Arch)
+
+### Q2: 提示 "浏览器已启动但 CDP 端口 9222 不可用"
+
 确保之前运行过 `--launch` 且浏览器进程没有被手动关闭。如果关闭了，重新运行 `--launch` 即可。
 
-### Q2: 下载失败，提示签名过期
+### Q3: 下载失败，提示签名过期
+
 下载链接的签名（`at_`, `ak_`, `ad_`）有几分钟的有效期。**刷新课程页面**后重新运行 `--download` 即可获取新的签名。
 
-### Q3: 某些章节扫描不到 PDF
+### Q4: 某些章节扫描不到 PDF
+
 本工具目前支持以下两种常见的 PDF 嵌入方式：
 - `pan-yz.chaoxing.com` 云盘预览页
 - `/ananas/modules/pdf/index.html` 内置阅读器
 
-如果课程使用了其他方式（如纯图片预览、第三方 Office 在线预览等），本工具暂时无法识别。
+如果课程使用了其他方式（如纯图片预览、第三方 Office 在线预览等），本工具暂时无法识别。欢迎提交 Issue 反馈。
 
-### Q4: 如何批量下载整门课的所有章节？
+### Q5: 如何批量下载整门课的所有章节？
+
 目前需要**手动切换章节**后重复运行 `--download`。自动遍历章节列表的功能尚在开发中，欢迎提交 PR！
+
+### Q6: 我不想用命令行，有更简单的方式吗？
+
+可以考虑使用浏览器扩展方案（零命令行操作），但目前本项目仅提供 Python 版本。有相关需求可以提 Issue 讨论。
 
 ---
 
 ## ⚠️ 免责声明
 
-本项目仅供学习和技术研究使用，请勿用于任何商业或非法用途。
+本项目仅供**学习和技术研究**使用，请勿用于任何商业或非法用途。
 
 使用本工具下载的内容版权归原作者及超星学习通平台所有。请尊重知识产权，在合理范围内使用下载的课件资料。因使用本工具而产生的任何法律责任，由使用者自行承担。
+
+---
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+- 发现 Bug？请提交 [Issue](https://github.com/HitTheStars/chaoxing-pdf-downloader/issues)
+- 有新想法？欢迎 [Discussions](https://github.com/HitTheStars/chaoxing-pdf-downloader/discussions)
+- 想改进代码？直接提交 PR
 
 ---
 
@@ -174,8 +238,10 @@ chaoxing-pdf-downloader/
 
 ---
 
-## 🌟 Star History
+<div align="center">
+
+如果本项目对你有帮助，请点个 ⭐ **Star** 支持一下！
 
 [![Star History Chart](https://api.star-history.com/svg?repos=HitTheStars/chaoxing-pdf-downloader&type=Date)](https://star-history.com/#HitTheStars/chaoxing-pdf-downloader&Date)
 
-> 如果本项目对你有帮助，请点个 ⭐ Star 支持一下！
+</div>

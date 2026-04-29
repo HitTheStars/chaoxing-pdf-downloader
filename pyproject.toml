@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chaoxing-pdf-downloader"
+version = "1.0.0"
+description = "超星学习通 PDF 批量下载器 —— 一键下载课程中不可下载的 PDF 课件"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "HitTheStars"}
+]
+keywords = ["chaoxing", "pdf", "downloader", "mooc", "playwright"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Education",
+    "Topic :: Utilities",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "playwright>=1.40.0",
+]
+
+[project.scripts]
+chaoxing-dl = "chaoxing_pdf_downloader:main"
+
+[project.urls]
+Homepage = "https://github.com/HitTheStars/chaoxing-pdf-downloader"
+Repository = "https://github.com/HitTheStars/chaoxing-pdf-downloader"
+Issues = "https://github.com/HitTheStars/chaoxing-pdf-downloader/issues"
+
+[tool.setuptools]
+py-modules = ["chaoxing_pdf_downloader"]
+
+[tool.setuptools.package-data]
+chaoxing_pdf_downloader = ["*.py"]

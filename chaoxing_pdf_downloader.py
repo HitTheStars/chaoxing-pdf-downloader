@@ -17,19 +17,28 @@
 
 import argparse
 import os
+import platform
 import re
 import sys
+import tempfile
 import time
+from pathlib import Path
 from urllib.parse import unquote, urlparse, parse_qs
 
 from playwright.sync_api import sync_playwright
 
 
 class ChaoxingPDFDownloader:
-    def __init__(self, profile_dir="/tmp/chaoxing_profile", download_dir=None, cdp_url="http://localhost:9222"):
+    def __init__(self, profile_dir=None, download_dir=None, cdp_url="http://localhost:9222"):
+        # 跨平台默认路径：项目目录下的 .chaoxing_profile
+        if profile_dir is None:
+            profile_dir = os.path.join(os.getcwd(), ".chaoxing_profile")
         self.profile_dir = profile_dir
         self.cdp_url = cdp_url
-        self.download_dir = download_dir or os.path.join(os.path.expanduser("~"), "Downloads")
+        # 跨平台默认下载目录
+        if download_dir is None:
+            download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+        self.download_dir = download_dir
         os.makedirs(self.download_dir, exist_ok=True)
         self.browser = None
         self.context = None
@@ -37,6 +46,8 @@ class ChaoxingPDFDownloader:
 
     def launch_browser(self, headless=False):
         """启动带 CDP 的持久化浏览器，用于首次登录"""
+        # 确保用户数据目录存在
+        os.makedirs(self.profile_dir, exist_ok=True)
         with sync_playwright() as p:
             self.context = p.chromium.launch_persistent_context(
                 user_data_dir=self.profile_dir,
@@ -49,7 +60,7 @@ class ChaoxingPDFDownloader:
             )
             self.page = self.context.new_page()
             print(f"[*] 浏览器已启动")
-            print(f"[*] 用户数据目录: {self.profile_dir}")
+            print(f"[*] 用户数据目录: {os.path.abspath(self.profile_dir)}")
             print(f"[*] CDP 端口: 9222")
             print("[*] 请手动登录超星学习通，登录完成后按 Ctrl+C 结束本进程\n")
             try:
@@ -240,7 +251,7 @@ def main():
     )
     parser.add_argument("--launch", action="store_true", help="启动持久化浏览器（首次使用）")
     parser.add_argument("--download", action="store_true", help="连接浏览器并下载当前页面所有 PDF")
-    parser.add_argument("--profile", default="/tmp/chaoxing_profile", help="Chrome 用户数据目录 (默认: /tmp/chaoxing_profile)")
+    parser.add_argument("--profile", default=None, help="Chrome 用户数据目录 (默认: 当前目录下的 .chaoxing_profile)")
     parser.add_argument("--output", default=None, help="PDF 保存目录 (默认: ~/Downloads)")
     parser.add_argument("--cdp", default="http://localhost:9222", help="CDP 调试地址 (默认: http://localhost:9222)")
 
