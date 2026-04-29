@@ -121,6 +121,7 @@ class ChaoxingPDFDownloader:
                 print(f"[Frame {i}] PDF Viewer")
                 try:
                     href = None
+                    fname = None
                     el = frame.locator("#downloadUrl").first
                     if el.count() > 0:
                         h = el.get_attribute("href") or ""
@@ -188,12 +189,11 @@ class ChaoxingPDFDownloader:
             dl.save_as(output_path)
 
             # 修正扩展名
-            with open(output_path, 'rb') as f:
-                header = f.read(8)
-            if header.startswith(b'PK\x03\x04'):
-                correct = '.xlsx' if 'xls' in final_name.lower() else '.docx'
-                if not output_path.lower().endswith(correct):
-                    new_path = os.path.splitext(output_path)[0] + correct
+            correct_ext = self._guess_ext_from_header(output_path)
+            if correct_ext:
+                current_ext = os.path.splitext(output_path)[1].lower()
+                if current_ext != correct_ext:
+                    new_path = os.path.splitext(output_path)[0] + correct_ext
                     os.rename(output_path, new_path)
                     output_path = new_path
                     final_name = os.path.basename(new_path)
@@ -308,6 +308,30 @@ class ChaoxingPDFDownloader:
             name = urlparse(url).path.split('/')[-1]
             if '.' in name:
                 return name
+        except Exception:
+            pass
+        return None
+
+    @staticmethod
+    def _guess_ext_from_header(path):
+        """根据文件头 magic bytes 猜测真实扩展名"""
+        try:
+            with open(path, 'rb') as f:
+                header = f.read(8)
+            if header.startswith(b'%PDF'):
+                return '.pdf'
+            elif header.startswith(b'PK\x03\x04'):
+                with open(path, 'rb') as f:
+                    data = f.read(4096)
+                if b'word/' in data:
+                    return '.docx'
+                elif b'xl/' in data:
+                    return '.xlsx'
+                elif b'ppt/' in data:
+                    return '.pptx'
+                return '.zip'
+            elif header.startswith(b'\xd0\xcf\x11\xe0'):
+                return '.doc'
         except Exception:
             pass
         return None
