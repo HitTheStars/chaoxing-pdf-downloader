@@ -198,15 +198,19 @@ chaoxing-pdf-downloader/
 
 ### Q4: 某些章节扫描不到 PDF
 
-本工具目前支持以下两种常见的 PDF 嵌入方式：
+本工具目前支持以下三种常见的资源嵌入方式：
 - `pan-yz.chaoxing.com` 云盘预览页
-- `/ananas/modules/pdf/index.html` 内置阅读器
+- `/ananas/modules/pdf/index.html` 内置阅读器（下载按钮可用）
+- `/ananas/modules/pdf/index.html` 内置阅读器（下载按钮被禁用，但链接藏在 JS 变量 `window.data` 中）
 
 如果课程使用了其他方式（如纯图片预览、第三方 Office 在线预览等），本工具暂时无法识别。欢迎提交 Issue 反馈。
 
 ### Q5: 如何批量下载整门课的所有章节？
 
-目前需要**手动切换章节**后重复运行 `--download`。自动遍历章节列表的功能尚在开发中，欢迎提交 PR！
+使用 `--bulk` 参数即可自动遍历所有章节并下载：
+```bash
+python chaoxing_pdf_downloader.py --bulk
+```
 
 ### Q6: 我不想用命令行，有更简单的方式吗？
 
